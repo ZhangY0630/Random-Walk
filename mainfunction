@@ -1,0 +1,88 @@
+import random
+class Location(object):
+	"""immutable type class"""
+	def __init__(self, x, y):
+		self.x = x
+		self.y = y
+		
+	def  move(self,deltaX,deltaY):
+		return Location(self.x + deltaX,
+						self.y + deltaY)
+	def  getX(self):
+		return self.x
+	def getY(self):
+		return self.y
+	def distFrom(self,other):
+		xDist = self.x - other.getX()
+		yDist = self.x - other.getY()
+		return (xDist**2 + yDist**2 )**0.5
+
+	def __str__(self):
+		return '<' + str(self.x) + ','\
+				   + ste(self.y) + '>'
+
+class Drunk(object):
+	"""docstring for Drunk"""
+	def __init__(self, name = None):
+		self.name = name
+
+	def __str__(self):
+		if self != None:
+			return self.name
+		return 'Anonymous'
+class UsualDrunk(Drunk):
+	def takeStep(self):
+		stepChoice = [(0,1),(0,1),(0,-1),(-1,0)]
+		return random.choice(stepChoice)
+class MasochistDrunk(Drunk):
+	def takeStep(self):
+		stepChoice = [(0.0,1.1),(0.0,-0.9),(1.0,0.0),(-1.0,0.0)]
+		return random.choice(stepChoice) 
+
+class Field(object):
+	def __init__(self):
+		self.drunks = {}
+
+	def addDrunk(self,drunk,loc):
+		if drunk in self.drunks:
+			raise ValueError('Duplicate drunk')
+		else:
+			self.drunks[drunk] = loc
+
+	def getLoc(self,drunk):
+		if drunk not in self.drunks:
+			raise ValueError('Drunk not in the field')
+		return self.drunks[drunk]
+
+	def MoveDrunk(self,drunk):
+		if drunk not in self.drunks:
+			raise ValueError ('Drunk not in the field ')
+		xDist,yDist = drunk.takeStep()
+		# use move method of location to get new location
+		self.drunks[drunk] = self.drunks[drunk].move(xDist,yDist)
+def walk(f,d,numSteps):
+	start = f.getLoc(d)
+	for s in range(numSteps):
+		f.MoveDrunk(d)
+	return start.distFrom(f.getLoc(d))
+
+def simWalks(numSteps,numTrials,dClass):
+	Homer  = dClass()
+	origin = Location(0,0)
+	distances = []
+	for t in range(numTrials):
+		f = Field()
+		f.addDrunk(Homer,origin)
+		distances.append(round(walk(f,Homer,numSteps),1))
+	return distances
+
+def DrunkTest(walkLengths,numTrials,dClass):
+	for numSteps in walkLengths:
+		distances =  simWalks(numSteps,numTrials,dClass)
+		print(dClass.__name__,'random walk of', numSteps,'steps')
+		print('Mean = ',round(sum(distances)/len(distances),4))
+		print("max = ",max(distances))
+		print("Min = ",min(distances))
+
+random.seed(0)
+DrunkTest((10,100,1000,10000),100,UsualDrunk)
