@@ -1,4 +1,4 @@
 # Random-Walk
-MIT-opencourseware \n
+MIT-opencourseware  
 give a simulation of things
 
